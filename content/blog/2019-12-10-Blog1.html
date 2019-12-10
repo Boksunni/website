@@ -1,0 +1,75 @@
+---
+title: Python Basics for Data Analysis
+author: Joseph Kim
+date: '2019-12-10'
+slug: regex
+categories: []
+tags: []
+description: ''
+---
+
+
+
+<div id="using-python-to-examine-datasets-basics" class="section level2">
+<h2>Using Python to examine datasets (Basics)</h2>
+<pre class="r"><code>library(reticulate)
+library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages ---------------------------- tidyverse 1.2.1 --</code></pre>
+<pre><code>## v ggplot2 3.2.1     v purrr   0.3.2
+## v tibble  2.1.3     v dplyr   0.8.3
+## v tidyr   1.0.0     v stringr 1.4.0
+## v readr   1.3.1     v forcats 0.4.0</code></pre>
+<pre><code>## -- Conflicts ------------------------------- tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>faithful&lt;-faithful
+glimpse(faithful)</code></pre>
+<pre><code>## Observations: 272
+## Variables: 2
+## $ eruptions &lt;dbl&gt; 3.600, 1.800, 3.333, 2.283, 4.533, 2.883, 4.700, 3.6...
+## $ waiting   &lt;dbl&gt; 79, 54, 74, 62, 85, 55, 88, 85, 51, 85, 54, 84, 78, ...</code></pre>
+<p><em>R and python have many similar functions and are compatible with each other through an R markdown file! Here I will be looking into the faithful dataset and see how I can use functions from pandas.</em></p>
+<pre class="python"><code>faithful=r.faithful 
+import py_compile
+import pandas as pd
+min(faithful[&quot;eruptions&quot;])</code></pre>
+<pre><code>## 1.6</code></pre>
+<pre class="python"><code>max(faithful[&quot;eruptions&quot;])</code></pre>
+<pre><code>## 5.1</code></pre>
+<pre class="python"><code>min(faithful[&quot;waiting&quot;])</code></pre>
+<pre><code>## 43.0</code></pre>
+<pre class="python"><code>max(faithful[&quot;waiting&quot;])</code></pre>
+<pre><code>## 96.0</code></pre>
+<p><em>Using the min and max functions, I can examine the lowest and highest values of the various variables within the faithful dataset!</em></p>
+<pre class="python"><code>import numpy as np
+
+np.mean(faithful[&quot;eruptions&quot;])</code></pre>
+<pre><code>## 3.4877830882352936</code></pre>
+<pre class="python"><code>np.mean(faithful[&quot;waiting&quot;])</code></pre>
+<pre><code>## 70.8970588235294</code></pre>
+<pre class="python"><code>np.median(faithful[&quot;eruptions&quot;])</code></pre>
+<pre><code>## 4.0</code></pre>
+<pre class="python"><code>np.median(faithful[&quot;waiting&quot;])</code></pre>
+<pre><code>## 76.0</code></pre>
+<pre class="python"><code>np.var(faithful[&quot;eruptions&quot;])</code></pre>
+<pre><code>## 1.2979388904492855</code></pre>
+<pre class="python"><code>np.var(faithful[&quot;waiting&quot;])</code></pre>
+<pre><code>## 184.14381487889264</code></pre>
+<pre class="python"><code>np.corrcoef(faithful[&quot;eruptions&quot;],faithful[&quot;waiting&quot;])</code></pre>
+<pre><code>## array([[1.        , 0.90081117],
+##        [0.90081117, 1.        ]])</code></pre>
+<p><em>Through numpy, I can look at the mean, median, variance, and correllation coefficients of the variables of the faithful dataset.</em></p>
+<div id="recall-how-logical-indexing-of-a-dataframe-works-in-python.-to-refresh-your-memory-in-the-example-code-below-i-ask-python-for-the-number-of-rows-in-the-dataset-where-the-variable-waiting-takes-on-values-greater-than-60.-then-i-ask-for-the-average-of-the-variable-eruptions-when-the-variable-waiting-is-above-60." class="section level5">
+<h5>Recall how logical indexing of a dataframe works in python. To refresh your memory, in the example code below I ask python for the number of rows in the dataset where the variable <code>waiting</code> takes on values greater than 60. Then I ask for the average of the variable <code>eruptions</code> when the variable <code>waiting</code> is above 60.</h5>
+<pre class="python"><code>faithful[faithful.waiting&gt;60].shape</code></pre>
+<pre><code>## (189, 2)</code></pre>
+<pre class="python"><code>faithful[faithful.waiting&gt;60].eruptions.mean()
+# or np.mean(faithful[faithful.waiting&gt;60].eruptions)</code></pre>
+<pre><code>## 4.138587301587303</code></pre>
+</div>
+<div id="pt-what-is-the-standard-deviation-of-the-variable-eruptions" class="section level5">
+<h5>3.2 (1 pt) What is the standard deviation of the variable <code>eruptions</code>?</h5>
+<pre class="python"><code>np.std(faithful.eruptions)</code></pre>
+<pre><code>## 1.1392712102257678</code></pre>
+</div>
+</div>
