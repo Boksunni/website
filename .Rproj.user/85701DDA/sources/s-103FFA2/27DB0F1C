@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1576006814572.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "27DB0F1C",
+    "lastKnownWriteTime" : 1576006763,
+    "last_content_update" : 1576006763,
+    "path" : "~/College/Fall 2019/Computational Bio/Project 3/Troubleshooting.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "22,0",
+        "scrollLine" : "1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

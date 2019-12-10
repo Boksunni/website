@@ -1,0 +1,92 @@
+---
+title: "Project 1"
+author: "SDS348 Fall 2019"
+date: ""
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(ggplot2)
+opts_chunk$set(fig.align="center", fig.height=5, message=FALSE, fig.width=8,tidy.opts=list(width.cutoff=60),tidy=TRUE)
+```
+
+## Joseph Kim jdk2677
+
+---
+
+The Datasets
+---
+```{R}
+TeenPregnancy <- load(file = "C:/Users/Joseph/Documents/College/Fall 2019/Computational Bio/Project 1/TeenPregnancy.rda")
+Election08 <- load(file = "C:/Users/Joseph/Documents/College/Fall 2019/Computational Bio/Project 1/Election08.rda")
+library(Stat2Data)
+data(TeenPregnancy)
+data(Election08)
+```
+*The datasets chosen for the project were TeenPregnancy and Election08 from the Stat2Data package. The TeenPregnancy dataset compiled teen pregnancy rates per 10000 girls for each state from 2010 in addition to other factors like the state's former status in the Civil War and percent church attendence. The Election08 dataset has information about education levels, income per capita, % difference in democrats and republicans and presidential outcomes for each state during the 2008 election.*
+
+Tidying and joining the data
+---
+```{R}
+glimpse(Election08)
+glimpse(TeenPregnancy)
+untid= TeenPregnancy %>% pivot_wider(names_from=CivilWar, values_from=Teen)
+glimpse(untid)
+tid= untid %>% pivot_longer(cols=3:6, names_to="CivilWar", values_to="Teen")
+test= tid %>% na.omit
+glimpse(test)
+master= Election08 %>% inner_join(TeenPregnancy, by=c("Abr"="State"))
+glimpse(master)
+```
+
+*As both datasets were already tidy, I just untidied the TeenPregnancy dataset and then retidied it to demonstrate my ability to use the pivot functions. The inner join was chosen to combine the datasets as both datasets shared all 50 states. Only 1 observation was dropped through the inner join. That observation for was Washington DC which was not present in the TeenPregnancy dataset.*
+
+Summary Statistics
+---
+```{R}
+master= master %>% mutate(CivilWar=recode_factor(CivilWar,B="Border",U="Union",C="Confederate",O="Other"))
+master= master %>% mutate(CandWin=recode_factor(ObamaWin,'1'="Obama",'0'="McCain"))
+master %>% select(State, Teen) %>% arrange((desc(Teen))) %>% glimpse()
+master %>% group_by(CivilWar) %>% summarize((mean(ObamaWin)))
+master %>% group_by(CivilWar) %>% summarize(mean(Teen))
+master %>% filter(CandWin=="Obama") %>% summarize(mean(Teen))
+master %>% filter(CandWin=="McCain") %>% summarize(mean(Teen))
+master %>% group_by(CivilWar, CandWin) %>% summarize(mean(Income), sd(Income), var(Income), min(Income), max(Income), n_distinct(Income)) 
+master %>% group_by(CivilWar, CandWin) %>% summarize(mean(HS), sd(HS), var(HS), min(HS), max(HS), n_distinct(HS)) 
+master %>% group_by(CivilWar, CandWin) %>% summarize(mean(BA), sd(BA), var(BA), min(BA), max(BA), n_distinct(BA)) 
+master %>% group_by(CivilWar, CandWin) %>% summarize(mean(Dem.Rep), sd(Dem.Rep), var(Dem.Rep), min(Dem.Rep), max(Dem.Rep), n_distinct(Dem.Rep)) 
+master %>% group_by(CivilWar, CandWin) %>% summarize(mean(Church), sd(Church), var(Church), min(Church), max(Church), n_distinct(Church)) 
+master %>% select(-State,-Abr, -CivilWar, -CandWin) %>% cor()
+```
+*I mutated a few new functions for the master dataset. CandWin converted the binary results of ObamaWin into a categorical variable. I also mutated the CivilWar variable so that it would give the full name instead of a single character abbreviation. From the core dplyr functions and from the summary statistics, I found several interesting relationships. New Mexico had the highest teen pregnancy rate. The vast majority of former Union states voted for Obama. When comparing former confederate with former union states, confederate states had on average higher teen pregnancy rates. States that voted for Obama had slightly lower average teen pregnancy rates. Former union states had higher income averages, higher % adults with high school education, higher % adults with college education, higher % democrats, and lower % church attendence than confederates. There seems to be a relatively strong correlation between income and state college education percent. There is also a relatively strong relationship between Teen pregnancy rate per 1000 and state high school education percent.*
+
+Correlation Plots
+---
+```{R}
+ggplot(data=master, aes(x= HS, y= Teen, color=CandWin)) +geom_point()+xlab("% of Adults with at least a High School Education") + ylab("Number of Teen Pregnancies per 1000 Teen Girls") +ggtitle("High School education percentages vs Teen Pregnancy rates for US States")
+ggplot(data=master, aes(x= BA, y= Income, color=CandWin)) +geom_point()+ylab("Income per Capita ($)") + xlab("% of Adults with at least a college degree") +ggtitle("College education percentages vs Income per capita for US States")
+ggplot(data=master, aes(x= CivilWar, y= Income, fill=CandWin)) +geom_bar(stat="summary", position="dodge")+geom_errorbar(stat="summary", position="dodge")+xlab("Former Civil War Status") + ylab("Average Income per Capita") +ggtitle("Former Civil War Status vs Average Income per Capita for US States")
+```
+*I made scatterplots using the highest correlated pairs of variables and examined if the distribution of the points were different for states that voted for Obama vs McCain. When plotting high school percentage and teen pregnancy, there seemed to be no distinction between states that voted for Obama vs states that voted for McCain. However, when plotting income and college education rates, states that voted for Obama seemed to be higher in income and college education percent compared to states that voted for McCain. I also wanted to show the information about the states' income per capita, former Civil War status via side-by-side bargraphs. Interestingly, states that voted for Obama had higher income in general even across Civil War status.*
+
+PCA
+---
+```{R}
+master_pca = master %>% select (-State, -Abr, -CivilWar, -CandWin, -ObamaWin)%>% scale
+master_pca = master_pca %>% scale %>% prcomp()
+master_pca %>% summary()
+master_pca$x%>%as.data.frame%>%mutate(CandWin=master$CandWin)%>%
+  ggplot(aes(PC1,PC2,col=CandWin))+geom_point()
+```
+*I performed a PCA using the variables given in the table hoping to be able to find a distinct separation of states that voted for McCain vs Obama. Running the analysis using PC1 and PC2 the two principal components with the most variance, I found a very rough separation. Although I don't exactly know what PC1 and PC2 represents, I believe that these two variables were sufficient to create a rough separation of the states that voted for Obama vs McCain.*
+
+```{R, echo=F}
+## DO NOT DELETE THIS BLOCK!
+sessionInfo()
+Sys.time()
+Sys.info()
+```

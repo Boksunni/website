@@ -1,0 +1,283 @@
+---
+title: "Project 1"
+author: "SDS348 Fall 2019"
+date: ""
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+
+<div id="joseph-kim-jdk2677" class="section level2">
+<h2>Joseph Kim jdk2677</h2>
+<hr />
+</div>
+<div id="the-datasets" class="section level2">
+<h2>The Datasets</h2>
+<pre class="r"><code>TeenPregnancy &lt;- load(file = &quot;C:/Users/Joseph/Documents/College/Fall 2019/Computational Bio/Project 1/TeenPregnancy.rda&quot;)
+Election08 &lt;- load(file = &quot;C:/Users/Joseph/Documents/College/Fall 2019/Computational Bio/Project 1/Election08.rda&quot;)
+library(Stat2Data)
+data(TeenPregnancy)
+data(Election08)</code></pre>
+<p><em>The datasets chosen for the project were TeenPregnancy and Election08 from the Stat2Data package. The TeenPregnancy dataset compiled teen pregnancy rates per 10000 girls for each state from 2010 in addition to other factors like the state’s former status in the Civil War and percent church attendence. The Election08 dataset has information about education levels, income per capita, % difference in democrats and republicans and presidential outcomes for each state during the 2008 election.</em></p>
+</div>
+<div id="tidying-and-joining-the-data" class="section level2">
+<h2>Tidying and joining the data</h2>
+<pre class="r"><code>glimpse(Election08)</code></pre>
+<pre><code>## Observations: 51
+## Variables: 7
+## $ State    &lt;fct&gt; Alabama , Alaska , Arizona , Arkansas , California , ...
+## $ Abr      &lt;fct&gt; AL, AK, AZ, AR, CA, CO, CT, DE, DC, FL, GA, HI, ID, I...
+## $ Income   &lt;int&gt; 32404, 40352, 33029, 30060, 41571, 41042, 54117, 4060...
+## $ HS       &lt;dbl&gt; 80.4, 90.5, 83.5, 81.1, 80.2, 88.9, 88.0, 87.4, 85.7,...
+## $ BA       &lt;dbl&gt; 21.4, 26.0, 25.3, 19.3, 29.5, 35.0, 34.7, 26.1, 47.5,...
+## $ Dem.Rep  &lt;int&gt; -1, -11, 0, 12, 19, 11, 26, 23, 75, 9, 4, 34, -15, 24...
+## $ ObamaWin &lt;int&gt; 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0,...</code></pre>
+<pre class="r"><code>glimpse(TeenPregnancy)</code></pre>
+<pre><code>## Observations: 50
+## Variables: 4
+## $ State    &lt;fct&gt; AK, AL, AR, AZ, CA, CO, CT, DE, FL, GA, HI, IA, ID, I...
+## $ CivilWar &lt;fct&gt; O, C, C, O, U, O, U, U, C, C, O, U, O, U, U, U, B, C,...
+## $ Church   &lt;int&gt; 26, 46, 45, 33, 28, 25, 25, 35, 32, 39, 25, 32, 34, 3...
+## $ Teen     &lt;int&gt; 64, 62, 73, 60, 59, 50, 44, 67, 60, 64, 65, 44, 47, 5...</code></pre>
+<pre class="r"><code>untid = TeenPregnancy %&gt;% pivot_wider(names_from = CivilWar, 
+    values_from = Teen)
+glimpse(untid)</code></pre>
+<pre><code>## Observations: 50
+## Variables: 6
+## $ State  &lt;fct&gt; AK, AL, AR, AZ, CA, CO, CT, DE, FL, GA, HI, IA, ID, IL,...
+## $ Church &lt;int&gt; 26, 46, 45, 33, 28, 25, 25, 35, 32, 39, 25, 32, 34, 32,...
+## $ O      &lt;int&gt; 64, NA, NA, 60, NA, 50, NA, NA, NA, NA, 65, NA, 47, NA,...
+## $ C      &lt;int&gt; NA, 62, 73, NA, NA, NA, NA, NA, 60, 64, NA, NA, NA, NA,...
+## $ U      &lt;int&gt; NA, NA, NA, NA, 59, NA, 44, 67, NA, NA, NA, 44, NA, 57,...
+## $ B      &lt;int&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,...</code></pre>
+<pre class="r"><code>tid = untid %&gt;% pivot_longer(cols = 3:6, names_to = &quot;CivilWar&quot;, 
+    values_to = &quot;Teen&quot;)
+test = tid %&gt;% na.omit
+glimpse(test)</code></pre>
+<pre><code>## Observations: 50
+## Variables: 4
+## $ State    &lt;fct&gt; AK, AL, AR, AZ, CA, CO, CT, DE, FL, GA, HI, IA, ID, I...
+## $ Church   &lt;int&gt; 26, 46, 45, 33, 28, 25, 25, 35, 32, 39, 25, 32, 34, 3...
+## $ CivilWar &lt;chr&gt; &quot;O&quot;, &quot;C&quot;, &quot;C&quot;, &quot;O&quot;, &quot;U&quot;, &quot;O&quot;, &quot;U&quot;, &quot;U&quot;, &quot;C&quot;, &quot;C&quot;, &quot;O&quot;...
+## $ Teen     &lt;int&gt; 64, 62, 73, 60, 59, 50, 44, 67, 60, 64, 65, 44, 47, 5...</code></pre>
+<pre class="r"><code>master = Election08 %&gt;% inner_join(TeenPregnancy, by = c(Abr = &quot;State&quot;))</code></pre>
+<pre><code>## Warning: Column `Abr`/`State` joining factors with different levels,
+## coercing to character vector</code></pre>
+<pre class="r"><code>glimpse(master)</code></pre>
+<pre><code>## Observations: 50
+## Variables: 10
+## $ State    &lt;fct&gt; Alabama , Alaska , Arizona , Arkansas , California , ...
+## $ Abr      &lt;chr&gt; &quot;AL&quot;, &quot;AK&quot;, &quot;AZ&quot;, &quot;AR&quot;, &quot;CA&quot;, &quot;CO&quot;, &quot;CT&quot;, &quot;DE&quot;, &quot;FL&quot;,...
+## $ Income   &lt;int&gt; 32404, 40352, 33029, 30060, 41571, 41042, 54117, 4060...
+## $ HS       &lt;dbl&gt; 80.4, 90.5, 83.5, 81.1, 80.2, 88.9, 88.0, 87.4, 84.9,...
+## $ BA       &lt;dbl&gt; 21.4, 26.0, 25.3, 19.3, 29.5, 35.0, 34.7, 26.1, 25.8,...
+## $ Dem.Rep  &lt;int&gt; -1, -11, 0, 12, 19, 11, 26, 23, 9, 4, 34, -15, 24, 9,...
+## $ ObamaWin &lt;int&gt; 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0,...
+## $ CivilWar &lt;fct&gt; C, O, O, C, U, O, U, U, C, C, O, O, U, U, U, U, B, C,...
+## $ Church   &lt;int&gt; 46, 26, 33, 45, 28, 25, 25, 35, 32, 39, 25, 34, 32, 3...
+## $ Teen     &lt;int&gt; 62, 64, 60, 73, 59, 50, 44, 67, 60, 64, 65, 47, 57, 5...</code></pre>
+<p><em>As both datasets were already tidy, I just untidied the TeenPregnancy dataset and then retidied it to demonstrate my ability to use the pivot functions. The inner join was chosen to combine the datasets as both datasets shared all 50 states. Only 1 observation was dropped through the inner join. That observation for was Washington DC which was not present in the TeenPregnancy dataset.</em></p>
+</div>
+<div id="summary-statistics" class="section level2">
+<h2>Summary Statistics</h2>
+<pre class="r"><code>master = master %&gt;% mutate(CivilWar = recode_factor(CivilWar, 
+    B = &quot;Border&quot;, U = &quot;Union&quot;, C = &quot;Confederate&quot;, O = &quot;Other&quot;))
+master = master %&gt;% mutate(CandWin = recode_factor(ObamaWin, 
+    `1` = &quot;Obama&quot;, `0` = &quot;McCain&quot;))
+master %&gt;% select(State, Teen) %&gt;% arrange((desc(Teen))) %&gt;% 
+    glimpse()</code></pre>
+<pre><code>## Observations: 50
+## Variables: 2
+## $ State &lt;fct&gt; New Mexico , Mississippi , Arkansas , Texas , Louisiana ...
+## $ Teen  &lt;int&gt; 80, 76, 73, 73, 69, 69, 68, 67, 65, 65, 64, 64, 64, 63, ...</code></pre>
+<pre class="r"><code>master %&gt;% group_by(CivilWar) %&gt;% summarize((mean(ObamaWin)))</code></pre>
+<pre><code>## # A tibble: 4 x 2
+##   CivilWar    `(mean(ObamaWin))`
+##   &lt;fct&gt;                    &lt;dbl&gt;
+## 1 Border                   0    
+## 2 Union                    0.952
+## 3 Confederate              0.273
+## 4 Other                    0.333</code></pre>
+<pre class="r"><code>master %&gt;% group_by(CivilWar) %&gt;% summarize(mean(Teen))</code></pre>
+<pre><code>## # A tibble: 4 x 2
+##   CivilWar    `mean(Teen)`
+##   &lt;fct&gt;              &lt;dbl&gt;
+## 1 Border              61.7
+## 2 Union               48.2
+## 3 Confederate         64.6
+## 4 Other               55.1</code></pre>
+<pre class="r"><code>master %&gt;% filter(CandWin == &quot;Obama&quot;) %&gt;% summarize(mean(Teen))</code></pre>
+<pre><code>##   mean(Teen)
+## 1   51.39286</code></pre>
+<pre class="r"><code>master %&gt;% filter(CandWin == &quot;McCain&quot;) %&gt;% summarize(mean(Teen))</code></pre>
+<pre><code>##   mean(Teen)
+## 1   58.90909</code></pre>
+<pre class="r"><code>master %&gt;% group_by(CivilWar, CandWin) %&gt;% summarize(mean(Income), 
+    sd(Income), var(Income), min(Income), max(Income), n_distinct(Income))</code></pre>
+<pre><code>## # A tibble: 7 x 8
+## # Groups:   CivilWar [4]
+##   CivilWar CandWin `mean(Income)` `sd(Income)` `var(Income)` `min(Income)`
+##   &lt;fct&gt;    &lt;fct&gt;            &lt;dbl&gt;        &lt;dbl&gt;         &lt;dbl&gt;         &lt;int&gt;
+## 1 Border   McCain          33218.        1828.      3342457.         31111
+## 2 Union    Obama           40446.        5940.     35287031.         33616
+## 3 Union    McCain          36768          NaN            NA          36768
+## 4 Confede~ Obama           37809         3895.     15167299          33636
+## 5 Confede~ McCain          32625.        2672.      7141323.         28845
+## 6 Other    Obama           38530.        3998.     15987979.         31474
+## 7 Other    McCain          34621         4313.     18604295.         29537
+## # ... with 2 more variables: `max(Income)` &lt;int&gt;,
+## #   `n_distinct(Income)` &lt;int&gt;</code></pre>
+<pre class="r"><code>master %&gt;% group_by(CivilWar, CandWin) %&gt;% summarize(mean(HS), 
+    sd(HS), var(HS), min(HS), max(HS), n_distinct(HS))</code></pre>
+<pre><code>## # A tibble: 7 x 8
+## # Groups:   CivilWar [4]
+##   CivilWar CandWin `mean(HS)` `sd(HS)` `var(HS)` `min(HS)` `max(HS)`
+##   &lt;fct&gt;    &lt;fct&gt;        &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Border   McCain        83.5     2.97      8.83      80.1      85.6
+## 2 Union    Obama         87.3     2.64      6.95      80.2      91  
+## 3 Union    McCain        89.1   NaN        NA         89.1      89.1
+## 4 Confede~ Obama         84.6     1.47      2.17      83        85.9
+## 5 Confede~ McCain        80.7     1.49      2.23      78.5      82.9
+## 6 Other    Obama         86.7     3.44     11.8       82.3      89.4
+## 7 Other    McCain        88.2     3.25     10.6       81.2      91.2
+## # ... with 1 more variable: `n_distinct(HS)` &lt;int&gt;</code></pre>
+<pre class="r"><code>master %&gt;% group_by(CivilWar, CandWin) %&gt;% summarize(mean(BA), 
+    sd(BA), var(BA), min(BA), max(BA), n_distinct(BA))</code></pre>
+<pre><code>## # A tibble: 7 x 8
+## # Groups:   CivilWar [4]
+##   CivilWar CandWin `mean(BA)` `sd(BA)` `var(BA)` `min(BA)` `max(BA)`
+##   &lt;fct&gt;    &lt;fct&gt;        &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Border   McCain        22.4     2.27      5.16      20        24.5
+## 2 Union    Obama         29.3     4.40     19.3       22.1      37.9
+## 3 Union    McCain        28.8   NaN        NA         28.8      28.8
+## 4 Confede~ Obama         28.3     4.56     20.8       25.6      33.6
+## 5 Confede~ McCain        22.2     2.88      8.29      18.9      27.1
+## 6 Other    Obama         28.2     5.10     26.0       21.8      35  
+## 7 Other    McCain        25.0     3.12      9.73      17.3      28.7
+## # ... with 1 more variable: `n_distinct(BA)` &lt;int&gt;</code></pre>
+<pre class="r"><code>master %&gt;% group_by(CivilWar, CandWin) %&gt;% summarize(mean(Dem.Rep), 
+    sd(Dem.Rep), var(Dem.Rep), min(Dem.Rep), max(Dem.Rep), n_distinct(Dem.Rep))</code></pre>
+<pre><code>## # A tibble: 7 x 8
+## # Groups:   CivilWar [4]
+##   CivilWar CandWin `mean(Dem.Rep)` `sd(Dem.Rep)` `var(Dem.Rep)`
+##   &lt;fct&gt;    &lt;fct&gt;             &lt;dbl&gt;         &lt;dbl&gt;          &lt;dbl&gt;
+## 1 Border   McCain            10             3.61          13   
+## 2 Union    Obama             21.4           7.27          52.9 
+## 3 Union    McCain            -2           NaN             NA   
+## 4 Confede~ Obama              9.67          1.15           1.33
+## 5 Confede~ McCain             4             4.54          20.6 
+## 6 Other    Obama             17.4           9.61          92.3 
+## 7 Other    McCain            -5.1          12.7          160.  
+## # ... with 3 more variables: `min(Dem.Rep)` &lt;int&gt;, `max(Dem.Rep)` &lt;int&gt;,
+## #   `n_distinct(Dem.Rep)` &lt;int&gt;</code></pre>
+<pre class="r"><code>master %&gt;% group_by(CivilWar, CandWin) %&gt;% summarize(mean(Church), 
+    sd(Church), var(Church), min(Church), max(Church), n_distinct(Church))</code></pre>
+<pre><code>## # A tibble: 7 x 8
+## # Groups:   CivilWar [4]
+##   CivilWar CandWin `mean(Church)` `sd(Church)` `var(Church)` `min(Church)`
+##   &lt;fct&gt;    &lt;fct&gt;            &lt;dbl&gt;        &lt;dbl&gt;         &lt;dbl&gt;         &lt;int&gt;
+## 1 Border   McCain            38.3         3.06          9.33            35
+## 2 Union    Obama             28.1         5.19         26.9             17
+## 3 Union    McCain            33         NaN            NA               33
+## 4 Confede~ Obama             35.7         4.04         16.3             32
+## 5 Confede~ McCain            43.2         3.20         10.2             39
+## 6 Other    Obama             27.4         4.93         24.3             24
+## 7 Other    McCain            33.1         7.03         49.4             26
+## # ... with 2 more variables: `max(Church)` &lt;int&gt;,
+## #   `n_distinct(Church)` &lt;int&gt;</code></pre>
+<pre class="r"><code>master %&gt;% select(-State, -Abr, -CivilWar, -CandWin) %&gt;% cor()</code></pre>
+<pre><code>##              Income         HS         BA    Dem.Rep   ObamaWin     Church
+## Income    1.0000000  0.3483387  0.7614231  0.4269658  0.5471626 -0.5666696
+## HS        0.3483387  1.0000000  0.5247460 -0.0305590  0.2814794 -0.6109170
+## BA        0.7614231  0.5247460  1.0000000  0.4073234  0.5573030 -0.6047603
+## Dem.Rep   0.4269658 -0.0305590  0.4073234  1.0000000  0.7232930 -0.4894987
+## ObamaWin  0.5471626  0.2814794  0.5573030  0.7232930  1.0000000 -0.5828711
+## Church   -0.5666696 -0.6109170 -0.6047603 -0.4894987 -0.5828711  1.0000000
+## Teen     -0.2929589 -0.7203528 -0.5521436 -0.1072486 -0.3231632  0.5091749
+##                Teen
+## Income   -0.2929589
+## HS       -0.7203528
+## BA       -0.5521436
+## Dem.Rep  -0.1072486
+## ObamaWin -0.3231632
+## Church    0.5091749
+## Teen      1.0000000</code></pre>
+<p><em>I mutated a few new functions for the master dataset. CandWin converted the binary results of ObamaWin into a categorical variable. I also mutated the CivilWar variable so that it would give the full name instead of a single character abbreviation. From the core dplyr functions and from the summary statistics, I found several interesting relationships. New Mexico had the highest teen pregnancy rate. The vast majority of former Union states voted for Obama. When comparing former confederate with former union states, confederate states had on average higher teen pregnancy rates. States that voted for Obama had slightly lower average teen pregnancy rates. Former union states had higher income averages, higher % adults with high school education, higher % adults with college education, higher % democrats, and lower % church attendence than confederates. There seems to be a relatively strong correlation between income and state college education percent. There is also a relatively strong relationship between Teen pregnancy rate per 1000 and state high school education percent.</em></p>
+</div>
+<div id="correlation-plots" class="section level2">
+<h2>Correlation Plots</h2>
+<pre class="r"><code>ggplot(data = master, aes(x = HS, y = Teen, color = CandWin)) + 
+    geom_point() + xlab(&quot;% of Adults with at least a High School Education&quot;) + 
+    ylab(&quot;Number of Teen Pregnancies per 1000 Teen Girls&quot;) + 
+    ggtitle(&quot;High School education percentages vs Teen Pregnancy rates for US States&quot;)</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(data = master, aes(x = BA, y = Income, color = CandWin)) + 
+    geom_point() + ylab(&quot;Income per Capita ($)&quot;) + xlab(&quot;% of Adults with at least a college degree&quot;) + 
+    ggtitle(&quot;College education percentages vs Income per capita for US States&quot;)</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-4-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(data = master, aes(x = CivilWar, y = Income, fill = CandWin)) + 
+    geom_bar(stat = &quot;summary&quot;, position = &quot;dodge&quot;) + geom_errorbar(stat = &quot;summary&quot;, 
+    position = &quot;dodge&quot;) + xlab(&quot;Former Civil War Status&quot;) + ylab(&quot;Average Income per Capita&quot;) + 
+    ggtitle(&quot;Former Civil War Status vs Average Income per Capita for US States&quot;)</code></pre>
+<pre><code>## Warning: Removed 1 rows containing missing values (geom_errorbar).</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-4-3.png" width="768" style="display: block; margin: auto;" />
+<em>I made scatterplots using the highest correlated pairs of variables and examined if the distribution of the points were different for states that voted for Obama vs McCain. When plotting high school percentage and teen pregnancy, there seemed to be no distinction between states that voted for Obama vs states that voted for McCain. However, when plotting income and college education rates, states that voted for Obama seemed to be higher in income and college education percent compared to states that voted for McCain. I also wanted to show the information about the states’ income per capita, former Civil War status via side-by-side bargraphs. Interestingly, states that voted for Obama had higher income in general even across Civil War status.</em></p>
+</div>
+<div id="pca" class="section level2">
+<h2>PCA</h2>
+<pre class="r"><code>master_pca = master %&gt;% select(-State, -Abr, -CivilWar, -CandWin, 
+    -ObamaWin) %&gt;% scale
+master_pca = master_pca %&gt;% scale %&gt;% prcomp()
+master_pca %&gt;% summary()</code></pre>
+<pre><code>## Importance of components:
+##                           PC1    PC2    PC3     PC4     PC5     PC6
+## Standard deviation     1.8381 1.1262 0.7778 0.63400 0.42666 0.40513
+## Proportion of Variance 0.5631 0.2114 0.1008 0.06699 0.03034 0.02736
+## Cumulative Proportion  0.5631 0.7745 0.8753 0.94231 0.97264 1.00000</code></pre>
+<pre class="r"><code>master_pca$x %&gt;% as.data.frame %&gt;% mutate(CandWin = master$CandWin) %&gt;% 
+    ggplot(aes(PC1, PC2, col = CandWin)) + geom_point()</code></pre>
+<p><img src="/Project1_files/figure-html/unnamed-chunk-5-1.png" width="768" style="display: block; margin: auto;" />
+<em>I performed a PCA using the variables given in the table hoping to be able to find a distinct separation of states that voted for McCain vs Obama. Running the analysis using PC1 and PC2 the two principal components with the most variance, I found a very rough separation. Although I don’t exactly know what PC1 and PC2 represents, I believe that these two variables were sufficient to create a rough separation of the states that voted for Obama vs McCain.</em></p>
+<pre><code>## R version 3.6.1 (2019-07-05)
+## Platform: x86_64-w64-mingw32/x64 (64-bit)
+## Running under: Windows 10 x64 (build 18362)
+## 
+## Matrix products: default
+## 
+## locale:
+## [1] LC_COLLATE=English_United States.1252 
+## [2] LC_CTYPE=English_United States.1252   
+## [3] LC_MONETARY=English_United States.1252
+## [4] LC_NUMERIC=C                          
+## [5] LC_TIME=English_United States.1252    
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+##  [1] Stat2Data_2.0.0 forcats_0.4.0   stringr_1.4.0   dplyr_0.8.3    
+##  [5] purrr_0.3.2     readr_1.3.1     tidyr_1.0.0     tibble_2.1.3   
+##  [9] ggplot2_3.2.1   tidyverse_1.2.1 knitr_1.25     
+## 
+## loaded via a namespace (and not attached):
+##  [1] tidyselect_0.2.5 xfun_0.10        haven_2.1.1      lattice_0.20-38 
+##  [5] colorspace_1.4-1 vctrs_0.2.0      generics_0.0.2   htmltools_0.4.0 
+##  [9] yaml_2.2.0       utf8_1.1.4       rlang_0.4.0      pillar_1.4.2    
+## [13] glue_1.3.1       withr_2.1.2      modelr_0.1.5     readxl_1.3.1    
+## [17] lifecycle_0.1.0  munsell_0.5.0    blogdown_0.17    gtable_0.3.0    
+## [21] cellranger_1.1.0 rvest_0.3.4      evaluate_0.14    labeling_0.3    
+## [25] fansi_0.4.0      broom_0.5.2      Rcpp_1.0.2       scales_1.0.0    
+## [29] backports_1.1.5  formatR_1.7      jsonlite_1.6     hms_0.5.1       
+## [33] digest_0.6.21    stringi_1.4.3    bookdown_0.16    grid_3.6.1      
+## [37] cli_1.1.0        tools_3.6.1      magrittr_1.5     lazyeval_0.2.2  
+## [41] crayon_1.3.4     pkgconfig_2.0.3  zeallot_0.1.0    xml2_1.2.2      
+## [45] lubridate_1.7.4  assertthat_0.2.1 rmarkdown_1.16   httr_1.4.1      
+## [49] rstudioapi_0.10  R6_2.4.0         nlme_3.1-140     compiler_3.6.1</code></pre>
+<pre><code>## [1] &quot;2019-12-10 14:12:35 CST&quot;</code></pre>
+<pre><code>##           sysname           release           version          nodename 
+##         &quot;Windows&quot;          &quot;10 x64&quot;     &quot;build 18362&quot; &quot;LAPTOP-SDK8EK00&quot; 
+##           machine             login              user    effective_user 
+##          &quot;x86-64&quot;          &quot;Joseph&quot;          &quot;Joseph&quot;          &quot;Joseph&quot;</code></pre>
+</div>

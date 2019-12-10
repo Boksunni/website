@@ -1,0 +1,36 @@
+---
+title: "Biopsy PCA"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(MASS)
+library(tidyverse)
+data(biopsy)
+bio=biopsy
+data<-biopsy%>%transmute(clump_thickness=V1,
+                         cell_uniformity=V2,
+                         marg_adhesion=V4,
+                         bland_chromatin=V7,
+                         outcome=class,
+                         y=as.numeric(outcome)-1)
+glimpse(data)
+select<-dplyr::select
+master_pca = data %>% select(-outcome, -y)%>% scale
+master_pca = master_pca %>% scale %>% prcomp()
+master_pca %>% summary()
+master_pca$x%>%as.data.frame%>%mutate(Status=data$outcome)%>%
+  ggplot(aes(PC1,PC2,col=Status))+geom_point()
+
+```
+

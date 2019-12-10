@@ -1,0 +1,56 @@
+---
+title: Python Basics for Data Analysis
+author: Joseph Kim
+date: '2019-12-10'
+slug: regex
+categories: []
+tags: []
+description: ''
+---
+Using Python to examine datasets (Basics)
+---
+```{R}
+library(reticulate)
+library(tidyverse)
+faithful<-faithful
+glimpse(faithful)
+```
+*R and python have many similar functions and are compatible with each other through an R markdown file! Here I will be looking into the faithful dataset and see how I can use functions from pandas.*
+```{python}
+faithful=r.faithful 
+import py_compile
+import pandas as pd
+min(faithful["eruptions"])
+max(faithful["eruptions"])
+min(faithful["waiting"])
+max(faithful["waiting"])
+```
+*Using the min and max functions, I can examine the lowest and highest values of the various variables within the faithful dataset!*
+```{python}
+import numpy as np
+
+np.mean(faithful["eruptions"])
+np.mean(faithful["waiting"])
+np.median(faithful["eruptions"])
+np.median(faithful["waiting"])
+np.var(faithful["eruptions"])
+np.var(faithful["waiting"])
+np.corrcoef(faithful["eruptions"],faithful["waiting"])
+```
+
+*Through numpy, I can look at the mean, median, variance, and correllation coefficients of the variables of the faithful dataset.*
+
+##### Recall how logical indexing of a dataframe works in python. To refresh your memory, in the example code below I ask python for the number of rows in the dataset where the variable `waiting` takes on values greater than 60. Then I ask for the average of the variable `eruptions` when the variable `waiting` is above 60.
+
+```{python}
+faithful[faithful.waiting>60].shape
+faithful[faithful.waiting>60].eruptions.mean()
+# or np.mean(faithful[faithful.waiting>60].eruptions)
+```
+
+
+##### 3.2 (1 pt) What is the standard deviation of the variable `eruptions`?
+
+```{python}
+np.std(faithful.eruptions)
+```

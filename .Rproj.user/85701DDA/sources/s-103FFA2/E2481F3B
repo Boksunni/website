@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1576009046951.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "E2481F3B",
+    "lastKnownWriteTime" : 1574375808,
+    "last_content_update" : 1574375808,
+    "path" : "~/College/Fall 2019/Computational Bio/HW10.Rmd",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "103,0",
+        "scrollLine" : "98"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

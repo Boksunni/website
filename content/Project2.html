@@ -1,0 +1,553 @@
+---
+title: "Project 2"
+author: "SDS348 Fall 2019"
+date: ""
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+
+<div id="joseph-kim-jdk2677" class="section level2">
+<h2>Joseph Kim jdk2677</h2>
+<hr />
+</div>
+<div id="the-datasets" class="section level2">
+<h2>The Datasets</h2>
+<pre class="r"><code>data(TeenPregnancy)
+data(Election08)
+master = Election08 %&gt;% inner_join(TeenPregnancy, by = c(Abr = &quot;State&quot;))</code></pre>
+<pre><code>## Warning: Column `Abr`/`State` joining factors with different levels,
+## coercing to character vector</code></pre>
+<pre class="r"><code>glimpse(master)</code></pre>
+<pre><code>## Observations: 50
+## Variables: 10
+## $ State    &lt;fct&gt; Alabama , Alaska , Arizona , Arkansas , California , ...
+## $ Abr      &lt;chr&gt; &quot;AL&quot;, &quot;AK&quot;, &quot;AZ&quot;, &quot;AR&quot;, &quot;CA&quot;, &quot;CO&quot;, &quot;CT&quot;, &quot;DE&quot;, &quot;FL&quot;,...
+## $ Income   &lt;int&gt; 32404, 40352, 33029, 30060, 41571, 41042, 54117, 4060...
+## $ HS       &lt;dbl&gt; 80.4, 90.5, 83.5, 81.1, 80.2, 88.9, 88.0, 87.4, 84.9,...
+## $ BA       &lt;dbl&gt; 21.4, 26.0, 25.3, 19.3, 29.5, 35.0, 34.7, 26.1, 25.8,...
+## $ Dem.Rep  &lt;int&gt; -1, -11, 0, 12, 19, 11, 26, 23, 9, 4, 34, -15, 24, 9,...
+## $ ObamaWin &lt;int&gt; 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0,...
+## $ CivilWar &lt;fct&gt; C, O, O, C, U, O, U, U, C, C, O, O, U, U, U, U, B, C,...
+## $ Church   &lt;int&gt; 46, 26, 33, 45, 28, 25, 25, 35, 32, 39, 25, 34, 32, 3...
+## $ Teen     &lt;int&gt; 62, 64, 60, 73, 59, 50, 44, 67, 60, 64, 65, 47, 57, 5...</code></pre>
+<p><em>The datasets chosen for the project were TeenPregnancy and Election08 from the Stat2Data package. The TeenPregnancy dataset compiled teen pregnancy rates per 10000 girls (HS) for each state from 2010 in addition to other factors like the state’s former status in the Civil War (CivilWar) and percent church attendence (Church). The Election08 dataset has information about % education levels (HS and BA), income per capita (Income), % difference in democrats and republicans (Dem.Rep) and presidential outcomes for each state during the 2008 election (ObamaWin).</em></p>
+</div>
+<div id="manova-anovas-post-hoc-assumptions" class="section level2">
+<h2>Manova, Anovas, Post-hoc, Assumptions</h2>
+<pre class="r"><code>man1 &lt;- manova(cbind(ObamaWin, Income, HS, BA, Teen, Church) ~ 
+    CivilWar, data = master)
+summary(man1)</code></pre>
+<pre><code>##           Df Pillai approx F num Df den Df    Pr(&gt;F)    
+## CivilWar   3 1.0685   3.9645     18    129 1.934e-06 ***
+## Residuals 46                                            
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>summary(aov(Income ~ CivilWar, data = master))</code></pre>
+<pre><code>##             Df    Sum Sq   Mean Sq F value  Pr(&gt;F)   
+## CivilWar     3 3.799e+08 126634302   5.242 0.00339 **
+## Residuals   46 1.111e+09  24158552                   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>summary(aov(ObamaWin ~ CivilWar, data = master))</code></pre>
+<pre><code>##             Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## CivilWar     3  5.852  1.9508   13.88 1.42e-06 ***
+## Residuals   46  6.468  0.1406                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>summary(aov(HS ~ CivilWar, data = master))</code></pre>
+<pre><code>##             Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## CivilWar     3  301.5  100.49   12.99 2.84e-06 ***
+## Residuals   46  355.9    7.74                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>summary(aov(BA ~ CivilWar, data = master))</code></pre>
+<pre><code>##             Df Sum Sq Mean Sq F value  Pr(&gt;F)   
+## CivilWar     3  291.4   97.13   5.691 0.00212 **
+## Residuals   46  785.1   17.07                   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>summary(aov(Teen ~ CivilWar, data = master))</code></pre>
+<pre><code>##             Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## CivilWar     3   2111   703.5   7.106 0.000507 ***
+## Residuals   46   4554    99.0                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>summary(aov(Church ~ CivilWar, data = master))</code></pre>
+<pre><code>##             Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## CivilWar     3   1320   440.1   14.12 1.17e-06 ***
+## Residuals   46   1433    31.2                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>pairwise.t.test(master$Income, master$CivilWar, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  master$Income and master$CivilWar 
+## 
+##   B      C      O     
+## C 0.7987 -      -     
+## O 0.3885 0.3391 -     
+## U 0.0245 0.0014 0.0120
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(master$ObamaWin, master$CivilWar, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  master$ObamaWin and master$CivilWar 
+## 
+##   B       C       O      
+## C 0.26993 -       -      
+## O 0.16656 0.68577 -      
+## U 0.00016 1.4e-05 1.3e-05
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(master$HS, master$CivilWar, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  master$HS and master$CivilWar 
+## 
+##   B     C       O    
+## C 0.338 -       -    
+## O 0.021 2.4e-06 -    
+## U 0.028 1.9e-06 0.749
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(master$BA, master$CivilWar, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  master$BA and master$CivilWar 
+## 
+##   B       C       O      
+## C 0.59528 -       -      
+## O 0.16723 0.18104 -      
+## U 0.00971 0.00093 0.02594
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(master$Teen, master$CivilWar, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  master$Teen and master$CivilWar 
+## 
+##   B     C       O    
+## C 0.649 -       -    
+## O 0.300 0.019   -    
+## U 0.034 5.8e-05 0.048
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>pairwise.t.test(master$Church, master$CivilWar, p.adj = &quot;none&quot;)</code></pre>
+<pre><code>## 
+##  Pairwise comparisons using t tests with pooled SD 
+## 
+## data:  master$Church and master$CivilWar 
+## 
+##   B      C       O     
+## C 0.4374 -       -     
+## O 0.0492 4.5e-05 -     
+## U 0.0057 1.5e-07 0.1356
+## 
+## P value adjustment method: none</code></pre>
+<pre class="r"><code>1 - 0.95^43</code></pre>
+<pre><code>## [1] 0.8898169</code></pre>
+<pre class="r"><code>0.05/43</code></pre>
+<pre><code>## [1] 0.001162791</code></pre>
+<pre class="r"><code>ggplot(master, aes(x = Church, y = HS)) + geom_point(alpha = 0.5) + 
+    geom_density_2d(h = 15) + coord_fixed() + facet_wrap(~CivilWar)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-2-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>select &lt;- dplyr::select
+covmats &lt;- master %&gt;% select(State, Abr, CivilWar, Income, HS, 
+    BA, Teen, Church, ObamaWin) %&gt;% group_by(CivilWar) %&gt;% do(covs = cov(.[4:9]))
+for (i in 1:4) {
+    print(covmats$covs[i])
+}</code></pre>
+<pre><code>## [[1]]
+##               Income       HS          BA         Teen       Church
+## Income   3342457.333 5419.200 3944.966667 -1411.666667 -4449.333333
+## HS          5419.200    8.830    6.545000    -3.850000    -7.600000
+## BA          3944.967    6.545    5.163333    -6.983333    -6.566667
+## Teen       -1411.667   -3.850   -6.983333    56.333333    15.666667
+## Church     -4449.333   -7.600   -6.566667    15.666667     9.333333
+## ObamaWin       0.000    0.000    0.000000     0.000000     0.000000
+##          ObamaWin
+## Income          0
+## HS              0
+## BA              0
+## Teen            0
+## Church          0
+## ObamaWin        0
+## 
+## [[1]]
+##               Income           HS           BA          Teen        Church
+## Income   13895207.40 5424.2900000 12945.770000 -19699.300000 -14367.700000
+## HS           5424.29    5.3527273     7.828364    -15.941818     -8.959091
+## BA          12945.77    7.8283636    18.174182    -26.950909    -16.684545
+## Teen       -19699.30  -15.9418182   -26.950909     63.254545     23.972727
+## Church     -14367.70   -8.9590909   -16.684545     23.972727     22.963636
+## ObamaWin     1131.00    0.8563636     1.338182     -2.690909     -1.654545
+##              ObamaWin
+## Income   1131.0000000
+## HS          0.8563636
+## BA          1.3381818
+## Teen       -2.6909091
+## Church     -1.6545455
+## ObamaWin    0.2181818
+## 
+## [[1]]
+##                 Income          HS           BA        Teen        Church
+## Income   20165687.9238 6564.799524 6770.9285714 3759.933333 -20386.128571
+## HS           6564.7995   10.686381    7.6257143  -23.770952     -2.870000
+## BA           6770.9286    7.625714   16.1057143  -17.850000     -4.378571
+## Teen         3759.9333  -23.770952  -17.8500000  134.066667    -24.514286
+## Church     -20386.1286   -2.870000   -4.3785714  -24.514286     46.457143
+## ObamaWin      930.6667   -0.347619    0.7571429    2.619048     -1.357143
+##             ObamaWin
+## Income   930.6666667
+## HS        -0.3476190
+## BA         0.7571429
+## Teen       2.6190476
+## Church    -1.3571429
+## ObamaWin   0.2380952
+## 
+## [[1]]
+##                 Income            HS            BA         Teen
+## Income   34166837.6619 -2.357987e+03  2.015803e+04 3804.3976190
+## HS          -2357.9869  6.756905e+00  8.951429e-01  -15.5626190
+## BA          20158.0329  8.951429e-01  1.837729e+01   -9.4635714
+## Teen         3804.3976 -1.556262e+01 -9.463571e+00   96.5904762
+## Church      -4756.0833 -3.611667e+00 -1.190000e+01   31.2166667
+## ObamaWin      175.1405 -8.547619e-02  2.571429e-02   -0.2380952
+##                 Church     ObamaWin
+## Income   -4756.0833333 175.14047619
+## HS          -3.6116667  -0.08547619
+## BA         -11.9000000   0.02571429
+## Teen        31.2166667  -0.23809524
+## Church      26.7333333  -0.23333333
+## ObamaWin    -0.2333333   0.04761905</code></pre>
+<p><em>Running the MANOVA, there was a significant mean difference across the levels of Civil War status for at least one of the many DVs. Running univariate ANOVAs, there was significant mean differences across CivilWar status for every DV. For the state groups that differ: Income (Union and Confederate, Union and Other, Union and Border) ObamaWin (Union and Border, Union and Confederate, Union and Other) HS (Other and Border, Other and Confederate, Union and Border, Union and Confederate) BA (Union and Border, Union and Confederate, Union and Other) Teen (Other and Confederate, Union and Border, Union and Confederate, Union and Other) Church (Other and Border, Other and Confederate, Union and Border, Union and Confederate). A total of 43 tests were performed resulting in an adjusted pvalue of .00116 and a type 1 error rate of 88.98%. With the adjusted pvalue, Income lost its Union and Border, Union and Confederate, Union and Other significances. HS lost its Other and Border, Union and Border significance. BA lost its Union and Border, Union and Other significance. Teen lost its Other and Confederate, Union and Border, Union and Other significance. Church lost its Other and Border, Union and Border significance. Just from looking at Church and HS, the multivariate normality assumption was not met. Using the covariance function, the dataset was found to also not meet the homogenity of covariance assumption. Overall, the dataset failed to meet the assumptions required for MANOVA.</em></p>
+</div>
+<div id="randomization-test" class="section level2">
+<h2>Randomization Test</h2>
+<pre class="r"><code>set.seed(123)
+obs_F &lt;- 13.88
+Fs &lt;- replicate(1000, {
+    new &lt;- master %&gt;% mutate(ObamaWin = sample(ObamaWin))
+    SSW &lt;- new %&gt;% group_by(CivilWar) %&gt;% summarize(SSW = sum((ObamaWin - 
+        mean(ObamaWin))^2)) %&gt;% summarize(sum(SSW)) %&gt;% pull
+    SSB &lt;- new %&gt;% mutate(mean = mean(ObamaWin)) %&gt;% group_by(CivilWar) %&gt;% 
+        mutate(groupmean = mean(ObamaWin)) %&gt;% summarize(SSB = sum((mean - 
+        groupmean)^2)) %&gt;% summarize(sum(SSB)) %&gt;% pull
+    (SSB/2)/(SSW/57)
+})
+hist(Fs, prob = T)
+abline(v = obs_F, col = &quot;red&quot;, add = T)</code></pre>
+<pre><code>## Warning in int_abline(a = a, b = b, h = h, v = v, untf = untf, ...): &quot;add&quot;
+## is not a graphical parameter</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>mean(Fs &gt; obs_F)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<p><em>For the randomization test, I performed a manual univariate anova for ObamaWin and CivilWar. The null hypothesis is there is no significant difference across CivilWar status for ObamaWin. The alternative hypothesis is that there is a significant difference between at least 2 CivilWar groups for ObamaWin. The mean of Fs&gt;obs_F resulted in a p value of 0 which indicates that there is a significant difference across the CivilWar groups for ObamaWin, rejecting the null hypothesis.</em></p>
+</div>
+<div id="linear-regression-with-differing-standard-errors" class="section level2">
+<h2>Linear Regression with differing standard errors</h2>
+<pre class="r"><code>master$BA_c = master$BA - mean(master$BA)
+
+fit1 &lt;- lm(Income ~ BA_c * CivilWar, data = master)
+summary(fit1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Income ~ BA_c * CivilWar, data = master)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+##  -8302  -2103   -138   1853   8437 
+## 
+## Coefficients:
+##                Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    36508.11    5188.48   7.036 1.29e-08 ***
+## BA_c             764.03    1106.45   0.691    0.494    
+## CivilWarC       -426.70    5351.77  -0.080    0.937    
+## CivilWarO       -315.12    5271.25  -0.060    0.953    
+## CivilWarU        938.97    5267.85   0.178    0.859    
+## BA_c:CivilWarC   -51.72    1137.45  -0.045    0.964    
+## BA_c:CivilWarO  -343.63    1131.50  -0.304    0.763    
+## BA_c:CivilWarU   332.86    1121.88   0.297    0.768    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3556 on 42 degrees of freedom
+## Multiple R-squared:  0.6439, Adjusted R-squared:  0.5846 
+## F-statistic: 10.85 on 7 and 42 DF,  p-value: 1.005e-07</code></pre>
+<pre class="r"><code>ggplot(master, aes(x = BA_c, y = Income, group = CivilWar)) + 
+    geom_point(aes(color = CivilWar)) + geom_smooth(method = &quot;lm&quot;, 
+    se = F, fullrange = T, aes(color = CivilWar)) + theme(legend.position = c(0.9, 
+    0.19))</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-4-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>resids &lt;- fit1$residuals
+fitvals &lt;- fit1$fitted.values
+
+shapiro.test(resids)</code></pre>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  resids
+## W = 0.98037, p-value = 0.5676</code></pre>
+<pre class="r"><code>ggplot() + geom_point(aes(fitvals, resids)) + geom_hline(yintercept = 0, 
+    color = &quot;red&quot;)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-4-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>coeftest(fit1, vcov = vcovHC(fit1))</code></pre>
+<pre><code>## 
+## t test of coefficients:
+## 
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)    36508.110   2685.922 13.5924   &lt;2e-16 ***
+## BA_c             764.035    704.339  1.0848   0.2842    
+## CivilWarC       -426.704   2807.670 -0.1520   0.8799    
+## CivilWarO       -315.117   2909.197 -0.1083   0.9143    
+## CivilWarU        938.967   2754.840  0.3408   0.7349    
+## BA_c:CivilWarC   -51.718    716.703 -0.0722   0.9428    
+## BA_c:CivilWarO  -343.630    762.458 -0.4507   0.6545    
+## BA_c:CivilWarU   332.864    730.852  0.4554   0.6511    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>fit2 &lt;- lm(Income ~ BA_c + CivilWar, data = master)
+summary(fit2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Income ~ BA_c + CivilWar, data = master)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -7068.8 -1713.3  -574.6  1135.3  9488.0 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  36702.6     2176.5  16.863  &lt; 2e-16 ***
+## BA_c           809.2      130.0   6.224 1.45e-07 ***
+## CivilWarC     -343.4     2380.2  -0.144    0.886    
+## CivilWarO     -260.8     2352.8  -0.111    0.912    
+## CivilWarU     1485.0     2419.9   0.614    0.543    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 3643 on 45 degrees of freedom
+## Multiple R-squared:  0.5995, Adjusted R-squared:  0.5639 
+## F-statistic: 16.84 on 4 and 45 DF,  p-value: 1.657e-08</code></pre>
+<p><em>With CivilWar Border states as the reference group, the linear regression predicts per capita income from mean centered BA and CivilWar grouping. With the y intercept set at when BA_c is equal to 0, Border states make $36508.11 income at mean BA. For confederate states, the y intercept drops by $426.70 income. For other states, the y intercept drops by $315.12 income. For Union states, the y intercept increases by $938.97 income. The slope at which Income increases per unit increase in BA_c for Border states, the reference group, is $764.03. For confederate states, this slope decreases by $51.72. For Other states, the slope drops by $343.63. For Union states, the slope increases by $332.86. Using the shapiro-wilk test, the normality assumption was met with a p value of .5675. Plotting out fitted values to the residuals indicated that the model also roughly met the linearity and homoskedsaticity assumptions. Not much changed using robust standard errors, as none of the predictors and interactions had significance prior to and after using the robust standard errors. P values did decrease a little bit across the board however. Overall, the predictors of BA_c and CivilWar status and their interactions were not strong predictors of Income. With an adjusted R-squared value of .5846, 58.46% of the variation in Income was explained by this model. Running another model without interactions yielded a model that had BA_c as a significant predictor of Income.</em></p>
+</div>
+<div id="boostrap-method" class="section level2">
+<h2>Boostrap Method</h2>
+<pre class="r"><code># Bootstrapped version SE were less than robust so p value is
+# smaller and thus more significant
+set.seed(123)
+samp_distn = NULL
+samp_distn &lt;- replicate(1000, {
+    boot_dat &lt;- master[sample(nrow(master), replace = TRUE), 
+        ]
+    fit &lt;- lm(Income ~ BA_c * CivilWar, data = boot_dat)
+    coef(fit)
+})
+
+samp_distn = do.call(rbind, lapply(samp_distn, unlist))</code></pre>
+<pre><code>## Warning in (function (..., deparse.level = 1) : number of columns of result
+## is not a multiple of vector length (arg 44)</code></pre>
+<pre class="r"><code>samp_distn %&gt;% as.data.frame %&gt;% summarize_all(sd, na.rm = T)</code></pre>
+<pre><code>##   (Intercept)     BA_c CivilWarC CivilWarO CivilWarU BA_c:CivilWarC
+## 1    1376.096 331.1476  1717.294   1745.76  1489.279       397.2869
+##   BA_c:CivilWarO BA_c:CivilWarU
+## 1       7914.979       378.4822</code></pre>
+<p><em>The standard errors from the bootstrap method except for BA_c:CivilWarO, were lower than that of the robust standard errors method and significantly lower than those of the original model. This would indicate that the pvalues for the bootstrapped standard errors would be lower than both the robust and original model for all the predictors except for BA_c:CivilWarO.</em></p>
+</div>
+<div id="logistic-regression-and-cross-validation" class="section level2">
+<h2>Logistic Regression and Cross validation</h2>
+<pre class="r"><code>class_diag &lt;- function(probs, truth) {
+    
+    tab &lt;- table(factor(probs &gt; 0.5, levels = c(&quot;FALSE&quot;, &quot;TRUE&quot;)), 
+        truth)
+    acc = sum(diag(tab))/sum(tab)
+    sens = tab[2, 2]/colSums(tab)[2]
+    spec = tab[1, 1]/colSums(tab)[1]
+    ppv = tab[2, 2]/rowSums(tab)[2]
+    
+    if (is.numeric(truth) == FALSE &amp; is.logical(truth) == FALSE) 
+        truth &lt;- as.numeric(truth) - 1
+    
+    ord &lt;- order(probs, decreasing = TRUE)
+    probs &lt;- probs[ord]
+    truth &lt;- truth[ord]
+    
+    TPR = cumsum(truth)/max(1, sum(truth))
+    FPR = cumsum(!truth)/max(1, sum(!truth))
+    
+    dup &lt;- c(probs[-1] &gt;= probs[-length(probs)], FALSE)
+    TPR &lt;- c(0, TPR[!dup], 1)
+    FPR &lt;- c(0, FPR[!dup], 1)
+    
+    n &lt;- length(TPR)
+    auc &lt;- sum(((TPR[-1] + TPR[-n])/2) * (FPR[-1] - FPR[-n]))
+    
+    data.frame(acc, sens, spec, ppv, auc)
+}
+
+fit3 &lt;- glm(ObamaWin ~ BA + Income + Church + Teen + HS + CivilWar, 
+    data = master, family = &quot;binomial&quot;)
+coeftest(fit3)</code></pre>
+<pre><code>## 
+## z test of coefficients:
+## 
+##                Estimate  Std. Error z value Pr(&gt;|z|)  
+## (Intercept)  4.2998e+01  3.5881e+03  0.0120  0.99044  
+## BA           2.8079e-01  2.2852e-01  1.2287  0.21918  
+## Income       2.5203e-05  2.3777e-04  0.1060  0.91558  
+## Church      -4.9730e-01  2.8485e-01 -1.7458  0.08084 .
+## Teen         1.1658e-02  8.2966e-02  0.1405  0.88825  
+## HS          -6.0499e-01  3.5562e-01 -1.7012  0.08890 .
+## CivilWarC    1.6652e+01  3.5879e+03  0.0046  0.99630  
+## CivilWarO    1.4851e+01  3.5879e+03  0.0041  0.99670  
+## CivilWarU    1.9950e+01  3.5879e+03  0.0056  0.99556  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>prob = predict(fit3, type = &quot;response&quot;)
+
+table(predict = as.numeric(prob &gt; 0.5), truth = master$ObamaWin) %&gt;% 
+    addmargins</code></pre>
+<pre><code>##        truth
+## predict  0  1 Sum
+##     0   20  2  22
+##     1    2 26  28
+##     Sum 22 28  50</code></pre>
+<pre class="r"><code>class_diag(prob, master$ObamaWin)</code></pre>
+<pre><code>##    acc      sens      spec       ppv       auc
+## 1 0.92 0.9285714 0.9090909 0.9285714 0.9659091</code></pre>
+<pre class="r"><code>master$ObamaWinf &lt;- as.factor(master$ObamaWin)
+master$logit &lt;- predict(fit3, type = &quot;link&quot;)
+master %&gt;% ggplot() + geom_density(aes(logit, color = ObamaWinf, 
+    fill = ObamaWinf), alpha = 0.4) + theme(legend.position = c(0.85, 
+    0.85)) + geom_vline(xintercept = 0) + xlab(&quot;predictor (logit)&quot;)</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ROCplot = ggplot(master) + geom_roc(aes(d = ObamaWin, m = prob), 
+    n.cuts = 0)
+ROCplot</code></pre>
+<p><img src="/Project2_files/figure-html/unnamed-chunk-6-2.png" width="768" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>calc_auc(ROCplot)</code></pre>
+<pre><code>##   PANEL group       AUC
+## 1     1    -1 0.9659091</code></pre>
+<pre class="r"><code>set.seed(1234)
+k = 10
+data1 &lt;- master[sample(nrow(master)), ]
+folds &lt;- cut(seq(1:nrow(master)), breaks = k, labels = F)
+
+diags &lt;- NULL
+for (i in 1:k) {
+    train &lt;- data1[folds != i, ]
+    test &lt;- data1[folds == i, ]
+    truth &lt;- test$ObamaWin
+    
+    fit &lt;- glm(ObamaWin ~ BA + Income + Church + Teen + HS + 
+        CivilWar, data = train, family = &quot;binomial&quot;)
+    probs &lt;- predict(fit, newdata = test, type = &quot;response&quot;)
+    
+    diags &lt;- rbind(diags, class_diag(probs, truth))
+}</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>apply(diags, 2, mean)</code></pre>
+<pre><code>##       acc      sens      spec       ppv       auc 
+## 0.8200000 0.8500000 0.8083333 0.8166667 0.9166667</code></pre>
+<p><em>With Border states as the reference group, higher levels of BA, Income and Teen increases the probability of the state voting for Obama. Having a higher level of Church and HS decreases the probability of the state voting for Obama. Compared to Border states, confederate, Other and Union states all have higher proabilities of voting for Obama. With the cutoff set to .5, the accuracy of the model is .92, the true positive rate is .928, the false positive rate is .909 and the recall is .928. The ROC plot had an AUC of 0.9659 which indicates that the model is very good at predicting whether a state would vote for Obama. However, doing a 10 fold CV with this model, the accuracy dropped to .82, true positive rate dropped to .9, false positive rate dropped to .725, the recall dropped to .818 and the AUC dropped to .85. These results indicate that the model was overfitted with too many predictors.</em></p>
+</div>
+<div id="lasso-test" class="section level2">
+<h2>Lasso Test</h2>
+<pre class="r"><code>fit4 &lt;- glm(ObamaWin ~ -1 + BA + Income + Church + Teen + HS + 
+    CivilWar, data = master, family = &quot;binomial&quot;)
+x &lt;- model.matrix(fit4)
+x &lt;- scale(x)
+y &lt;- as.matrix(master$ObamaWin)
+
+cv &lt;- cv.glmnet(x, y, family = &quot;binomial&quot;)
+lasso &lt;- glmnet(x, y, family = &quot;binomial&quot;, lambda = cv$lambda.1se)
+coef(lasso)</code></pre>
+<pre><code>## 10 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
+##                      s0
+## (Intercept)  0.27971916
+## BA           0.07348194
+## Income       .         
+## Church      -0.17995641
+## Teen         .         
+## HS           .         
+## CivilWarB    .         
+## CivilWarC    .         
+## CivilWarO    .         
+## CivilWarU    0.57656368</code></pre>
+<pre class="r"><code>masterdum = data.frame(master, Union = ifelse(master$CivilWar == 
+    &quot;U&quot;, 1, 0))
+
+set.seed(1234)
+k = 10
+data1 &lt;- masterdum[sample(nrow(masterdum)), ]
+folds &lt;- cut(seq(1:nrow(masterdum)), breaks = k, labels = F)
+
+diags &lt;- NULL
+for (i in 1:k) {
+    train &lt;- data1[folds != i, ]
+    test &lt;- data1[folds == i, ]
+    truth &lt;- test$ObamaWin
+    
+    fit &lt;- glm(ObamaWin ~ BA + Income + Church + Union, data = train, 
+        family = &quot;binomial&quot;)
+    probs &lt;- predict(fit, newdata = test, type = &quot;response&quot;)
+    
+    diags &lt;- rbind(diags, class_diag(probs, truth))
+}
+apply(diags, 2, mean)</code></pre>
+<pre><code>##       acc      sens      spec       ppv       auc 
+## 0.8200000 0.8583333 0.7833333 0.8500000 0.8500000</code></pre>
+<p><em>Running a Lasso regression on the model, only BA, Income, Church, and being a Union state was found to be significant. Running a 10 fold CV on the new model with only the Lasso variables, gave a slightly better accuracy of .84, a slightly worse true positive rate of .866, a better false positive rate of .825, a better recall of .858 and a better AUC of .908. Overall, the lasso model performed better than the original model during 10 fold CV and is less likely to be overfitted.</em></p>
+<pre><code>## R version 3.6.1 (2019-07-05)
+## Platform: x86_64-w64-mingw32/x64 (64-bit)
+## Running under: Windows 10 x64 (build 18362)
+## 
+## Matrix products: default
+## 
+## locale:
+## [1] LC_COLLATE=English_United States.1252 
+## [2] LC_CTYPE=English_United States.1252   
+## [3] LC_MONETARY=English_United States.1252
+## [4] LC_NUMERIC=C                          
+## [5] LC_TIME=English_United States.1252    
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+##  [1] formatR_1.7     plotROC_2.2.1   glmnet_3.0      Matrix_1.2-17  
+##  [5] Stat2Data_2.0.0 lmtest_0.9-37   zoo_1.8-6       MASS_7.3-51.4  
+##  [9] sandwich_2.5-1  forcats_0.4.0   stringr_1.4.0   dplyr_0.8.3    
+## [13] purrr_0.3.2     readr_1.3.1     tidyr_1.0.0     tibble_2.1.3   
+## [17] ggplot2_3.2.1   tidyverse_1.2.1 knitr_1.25     
+## 
+## loaded via a namespace (and not attached):
+##  [1] Rcpp_1.0.2       lubridate_1.7.4  lattice_0.20-38  assertthat_0.2.1
+##  [5] zeallot_0.1.0    digest_0.6.21    foreach_1.4.7    utf8_1.1.4      
+##  [9] R6_2.4.0         cellranger_1.1.0 plyr_1.8.4       backports_1.1.5 
+## [13] evaluate_0.14    httr_1.4.1       blogdown_0.17    pillar_1.4.2    
+## [17] rlang_0.4.0      lazyeval_0.2.2   readxl_1.3.1     rstudioapi_0.10 
+## [21] rmarkdown_1.16   labeling_0.3     munsell_0.5.0    broom_0.5.2     
+## [25] compiler_3.6.1   modelr_0.1.5     xfun_0.10        pkgconfig_2.0.3 
+## [29] shape_1.4.4      htmltools_0.4.0  tidyselect_0.2.5 bookdown_0.16   
+## [33] codetools_0.2-16 fansi_0.4.0      crayon_1.3.4     withr_2.1.2     
+## [37] grid_3.6.1       nlme_3.1-140     jsonlite_1.6     gtable_0.3.0    
+## [41] lifecycle_0.1.0  magrittr_1.5     scales_1.0.0     cli_1.1.0       
+## [45] stringi_1.4.3    xml2_1.2.2       generics_0.0.2   vctrs_0.2.0     
+## [49] iterators_1.0.12 tools_3.6.1      glue_1.3.1       hms_0.5.1       
+## [53] yaml_2.2.0       colorspace_1.4-1 rvest_0.3.4      haven_2.1.1</code></pre>
+<pre><code>## [1] &quot;2019-12-10 14:13:34 CST&quot;</code></pre>
+<pre><code>##           sysname           release           version          nodename 
+##         &quot;Windows&quot;          &quot;10 x64&quot;     &quot;build 18362&quot; &quot;LAPTOP-SDK8EK00&quot; 
+##           machine             login              user    effective_user 
+##          &quot;x86-64&quot;          &quot;Joseph&quot;          &quot;Joseph&quot;          &quot;Joseph&quot;</code></pre>
+</div>
