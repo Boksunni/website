@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Resumes on Joseph Kim</title>
+    <link>/resume/</link>
+    <description>Recent content in Resumes on Joseph Kim</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Wed, 11 Dec 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/resume/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Resume</title>
+      <link>/resume/resume-page/</link>
+      <pubDate>Wed, 11 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/resume/resume-page/</guid>
+      <description>About MeI am a senior Biology student at the University of Texas at Austin. I am from Dallas, Texas.Tennis and sculpture are some of my favorite passtimes! Contact me at Boksunni1@gmail.com!For a more detailed resume, click on the link on the homepage!
+AwardsNational Merit Finalist: 2016
+Undergraduate Research Fellowship: 2019
+Ralph A Steiner MD Scholarship: 2017-2018
+Jack Roloson Endowed Presidential Scholarship: 2018-2020</description>
+    </item>
+    
+  </channel>
+</rss>
