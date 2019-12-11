@@ -1,0 +1,28 @@
+---
+title: "Resume"
+output: html_document
+---
+
+
+
+About Me
+---
+
+I am a senior Biology student at the University of Texas at Austin. I am from Dallas, Texas.
+Tennis and sculpture are some of my favorite passtimes! Contact me at Boksunni1@gmail.com!
+
+Awards
+---
+National Merit Finalist: 2016
+Undergraduate Research Fellowship: 2019
+Ralph A Steiner MD Scholarship: 2017-2018
+Jack Roloson Endowed Presidential Scholarship: 2018-2020
+
+Work Experience
+---
+UTSouthwestern Student Intern: Summer of 2015, 2016, 2017
+FRI Research Mentor: Jan 2018-Present
+
+Skills
+---
+Research competencies in: qPCR, RNA extraction, Western Blot, Lentiviral production, Cell culture, dissections. 

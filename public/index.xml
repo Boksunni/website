@@ -6,10 +6,23 @@
     <description>Recent content on Joseph Kim</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Tue, 10 Dec 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 11 Dec 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Resume</title>
+      <link>/resume-page/</link>
+      <pubDate>Wed, 11 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/resume-page/</guid>
+      <description>About MeI am a senior Biology student at the University of Texas at Austin. I am from Dallas, Texas.Tennis and sculpture are some of my favorite passtimes! Contact me at Boksunni1@gmail.com!For a more detailed resume, click on the link on the homepage!
+AwardsNational Merit Finalist: 2016
+Undergraduate Research Fellowship: 2019
+Ralph A Steiner MD Scholarship: 2017-2018
+Jack Roloson Endowed Presidential Scholarship: 2018-2020</description>
+    </item>
     
     <item>
       <title>Python Basics for Data Analysis</title>
@@ -21,12 +34,21 @@
     </item>
     
     <item>
-      <title>Python Basics for Data Analysis</title>
-      <link>/blog/regex/</link>
-      <pubDate>Tue, 10 Dec 2019 00:00:00 +0000</pubDate>
+      <title>Project 2</title>
+      <link>/project2/</link>
+      <pubDate>Mon, 25 Nov 2019 00:00:00 +0000</pubDate>
       
-      <guid>/blog/regex/</guid>
-      <description>Using Python to examine datasets (Basics)library(reticulate)library(tidyverse)## -- Attaching packages ---------------------------- tidyverse 1.2.1 --## v ggplot2 3.2.1 v purrr 0.3.2## v tibble 2.1.3 v dplyr 0.8.3## v tidyr 1.0.0 v stringr 1.4.0## v readr 1.3.1 v forcats 0.4.0## -- Conflicts ------------------------------- tidyverse_conflicts() --## x dplyr::filter() masks stats::filter()## x dplyr::lag() masks stats::lag()faithful&amp;lt;-faithfulglimpse(faithful)## Observations: 272## Variables: 2## $ eruptions &amp;lt;dbl&amp;gt; 3.</description>
+      <guid>/project2/</guid>
+      <description>Joseph Kim jdk2677The Datasetsdata(TeenPregnancy)data(Election08)master = Election08 %&amp;gt;% inner_join(TeenPregnancy, by = c(Abr = &amp;quot;State&amp;quot;))## Warning: Column `Abr`/`State` joining factors with different levels,## coercing to character vectorglimpse(master)## Observations: 50## Variables: 10## $ State &amp;lt;fct&amp;gt; Alabama , Alaska , Arizona , Arkansas , California , ...## $ Abr &amp;lt;chr&amp;gt; &amp;quot;AL&amp;quot;, &amp;quot;AK&amp;quot;, &amp;quot;AZ&amp;quot;, &amp;quot;AR&amp;quot;, &amp;quot;CA&amp;quot;, &amp;quot;CO&amp;quot;, &amp;quot;CT&amp;quot;, &amp;quot;DE&amp;quot;, &amp;quot;FL&amp;quot;,...## $ Income &amp;lt;int&amp;gt; 32404, 40352, 33029, 30060, 41571, 41042, 54117, 4060.</description>
+    </item>
+    
+    <item>
+      <title>Project 1</title>
+      <link>/project1/</link>
+      <pubDate>Sun, 20 Oct 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/project1/</guid>
+      <description>Joseph Kim jdk2677The DatasetsTeenPregnancy &amp;lt;- load(file = &amp;quot;C:/Users/Joseph/Documents/College/Fall 2019/Computational Bio/Project 1/TeenPregnancy.rda&amp;quot;)Election08 &amp;lt;- load(file = &amp;quot;C:/Users/Joseph/Documents/College/Fall 2019/Computational Bio/Project 1/Election08.rda&amp;quot;)library(Stat2Data)data(TeenPregnancy)data(Election08)The datasets chosen for the project were TeenPregnancy and Election08 from the Stat2Data package. The TeenPregnancy dataset compiled teen pregnancy rates per 10000 girls for each state from 2010 in addition to other factors like the state’s former status in the Civil War and percent church attendence.</description>
     </item>
     
     <item>
@@ -39,24 +61,6 @@
   Project 1
   Project 2
   </description>
-    </item>
-    
-    <item>
-      <title>Project 1</title>
-      <link>/project1/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/project1/</guid>
-      <description>Joseph Kim jdk2677The DatasetsTeenPregnancy &amp;lt;- load(file = &amp;quot;C:/Users/Joseph/Documents/College/Fall 2019/Computational Bio/Project 1/TeenPregnancy.rda&amp;quot;)Election08 &amp;lt;- load(file = &amp;quot;C:/Users/Joseph/Documents/College/Fall 2019/Computational Bio/Project 1/Election08.rda&amp;quot;)library(Stat2Data)data(TeenPregnancy)data(Election08)The datasets chosen for the project were TeenPregnancy and Election08 from the Stat2Data package. The TeenPregnancy dataset compiled teen pregnancy rates per 10000 girls for each state from 2010 in addition to other factors like the state’s former status in the Civil War and percent church attendence.</description>
-    </item>
-    
-    <item>
-      <title>Project 2</title>
-      <link>/project2/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/project2/</guid>
-      <description>Joseph Kim jdk2677The Datasetsdata(TeenPregnancy)data(Election08)master = Election08 %&amp;gt;% inner_join(TeenPregnancy, by = c(Abr = &amp;quot;State&amp;quot;))## Warning: Column `Abr`/`State` joining factors with different levels,## coercing to character vectorglimpse(master)## Observations: 50## Variables: 10## $ State &amp;lt;fct&amp;gt; Alabama , Alaska , Arizona , Arkansas , California , ...## $ Abr &amp;lt;chr&amp;gt; &amp;quot;AL&amp;quot;, &amp;quot;AK&amp;quot;, &amp;quot;AZ&amp;quot;, &amp;quot;AR&amp;quot;, &amp;quot;CA&amp;quot;, &amp;quot;CO&amp;quot;, &amp;quot;CT&amp;quot;, &amp;quot;DE&amp;quot;, &amp;quot;FL&amp;quot;,...## $ Income &amp;lt;int&amp;gt; 32404, 40352, 33029, 30060, 41571, 41042, 54117, 4060.</description>
     </item>
     
   </channel>

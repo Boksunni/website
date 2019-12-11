@@ -9,6 +9,7 @@ description: ''
 ---
 Using Python to examine datasets (Basics)
 ---
+![](/blog/2019-12-10-Blog1_files/python-logo.png)
 ```{R}
 library(reticulate)
 library(tidyverse)
@@ -25,7 +26,7 @@ max(faithful["eruptions"])
 min(faithful["waiting"])
 max(faithful["waiting"])
 ```
-*Using the min and max functions, I can examine the lowest and highest values of the various variables within the faithful dataset!*
+*Using the min and max functions, I can examine the lowest and highest values of the various variables within the faithful dataset! This is identical to the min and max functions of R!*
 ```{python}
 import numpy as np
 
@@ -38,19 +39,5 @@ np.var(faithful["waiting"])
 np.corrcoef(faithful["eruptions"],faithful["waiting"])
 ```
 
-*Through numpy, I can look at the mean, median, variance, and correllation coefficients of the variables of the faithful dataset.*
+*Through numpy, I can look at the mean, median, variance, and correllation coefficients of the variables of the faithful dataset. While you would use tidyverse and the summarize function to get these values, python has standalone functions through numpy! Python is very flexible for analyzing data!*
 
-##### Recall how logical indexing of a dataframe works in python. To refresh your memory, in the example code below I ask python for the number of rows in the dataset where the variable `waiting` takes on values greater than 60. Then I ask for the average of the variable `eruptions` when the variable `waiting` is above 60.
-
-```{python}
-faithful[faithful.waiting>60].shape
-faithful[faithful.waiting>60].eruptions.mean()
-# or np.mean(faithful[faithful.waiting>60].eruptions)
-```
-
-
-##### 3.2 (1 pt) What is the standard deviation of the variable `eruptions`?
-
-```{python}
-np.std(faithful.eruptions)
-```

@@ -1,0 +1,234 @@
+---
+title: "Project 2"
+author: "SDS348 Fall 2019"
+date: ""
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r global_options, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(ggplot2)
+library(sandwich)
+library(MASS)
+library(lmtest)
+library(Stat2Data)
+library(glmnet)
+library(plotROC)
+library(formatR)
+opts_chunk$set(fig.align="center", fig.height=5, message=FALSE, fig.width=8,tidy.opts=list(width.cutoff=60),tidy=TRUE)
+```
+
+## Joseph Kim jdk2677
+
+---
+
+The Datasets
+---
+```{R}
+data(TeenPregnancy)
+data(Election08)
+master= Election08 %>% inner_join(TeenPregnancy, by=c("Abr"="State"))
+glimpse(master)
+```
+*The datasets chosen for the project were TeenPregnancy and Election08 from the Stat2Data package. The TeenPregnancy dataset compiled teen pregnancy rates per 10000 girls (HS) for each state from 2010 in addition to other factors like the state's former status in the Civil War (CivilWar) and percent church attendence (Church). The Election08 dataset has information about % education levels (HS and BA), income per capita (Income), % difference in democrats and republicans (Dem.Rep) and presidential outcomes for each state during the 2008 election (ObamaWin).*
+
+Manova, Anovas, Post-hoc, Assumptions
+---
+```{R}
+man1<-manova(cbind(ObamaWin,Income,HS,BA,Teen,Church)~CivilWar, data=master)
+summary(man1)
+
+summary(aov(Income~CivilWar,data=master))
+summary(aov(ObamaWin~CivilWar,data=master))
+summary(aov(HS~CivilWar,data=master))
+summary(aov(BA~CivilWar,data=master))
+summary(aov(Teen~CivilWar,data=master))
+summary(aov(Church~CivilWar,data=master))
+
+pairwise.t.test(master$Income, master$CivilWar, p.adj = "none")
+pairwise.t.test(master$ObamaWin, master$CivilWar, p.adj = "none")
+pairwise.t.test(master$HS, master$CivilWar, p.adj = "none")
+pairwise.t.test(master$BA, master$CivilWar, p.adj = "none")
+pairwise.t.test(master$Teen, master$CivilWar, p.adj = "none")
+pairwise.t.test(master$Church, master$CivilWar, p.adj = "none")
+1-.95^43
+.05/43
+
+ggplot(master, aes(x = Church, y = HS)) +
+ geom_point(alpha = .5) + geom_density_2d(h=15) + coord_fixed() + facet_wrap(~CivilWar)
+
+select<-dplyr::select
+covmats<-master%>%select(State, Abr, CivilWar, Income, HS, BA, Teen, Church, ObamaWin)%>% group_by(CivilWar)%>%do(covs=cov(.[4:9]))
+for(i in 1:4){print(covmats$covs[i])}
+```
+*Running the MANOVA, there was a significant mean difference across the levels of Civil War status for at least one of the many DVs. Running univariate ANOVAs, there was significant mean differences across CivilWar status for every DV. For the state groups that differ: Income (Union and Confederate, Union and Other, Union and Border) ObamaWin (Union and Border, Union and Confederate, Union and Other) HS (Other and Border, Other and Confederate, Union and Border, Union and Confederate) BA (Union and Border, Union and Confederate, Union and Other) Teen (Other and Confederate, Union and Border, Union and Confederate, Union and Other) Church (Other and Border, Other and Confederate, Union and Border, Union and Confederate). A total of 43 tests were performed resulting in an adjusted pvalue of .00116 and a type 1 error rate of 88.98%. With the adjusted pvalue, Income lost its Union and Border, Union and Confederate, Union and Other significances. HS lost its Other and Border, Union and Border significance. BA lost its Union and Border, Union and Other significance. Teen lost its Other and Confederate, Union and Border, Union and Other significance. Church lost its Other and Border, Union and Border significance. Just from looking at Church and HS, the multivariate normality assumption was not met. Using the covariance function, the dataset was found to also not meet the homogenity of covariance assumption. Overall, the dataset failed to meet the assumptions required for MANOVA.*
+
+Randomization Test
+---
+```{R}
+set.seed(123)
+obs_F<-13.88
+Fs<-replicate(1000,{
+ new<-master%>%mutate(ObamaWin=sample(ObamaWin))
+ SSW<- new%>%group_by(CivilWar)%>%summarize(SSW=sum((ObamaWin-mean(ObamaWin))^2))%>%summarize(sum(SSW))%>%pull
+ SSB<- new%>%mutate(mean=mean(ObamaWin))%>%group_by(CivilWar)%>%mutate(groupmean=mean(ObamaWin))%>%
+ summarize(SSB=sum((mean-groupmean)^2))%>%summarize(sum(SSB))%>%pull
+ (SSB/2)/(SSW/57)
+})
+hist(Fs, prob=T); abline(v = obs_F, col="red",add=T)
+mean(Fs>obs_F)
+```
+*For the randomization test, I performed a manual univariate anova for ObamaWin and CivilWar. The null hypothesis is there is no significant difference across CivilWar status for ObamaWin. The alternative hypothesis is that there is a significant difference between at least 2 CivilWar groups for ObamaWin. The mean of Fs>obs_F resulted in a p value of 0 which indicates that there is a significant difference across the CivilWar groups for ObamaWin, rejecting the null hypothesis.*
+
+Linear Regression with differing standard errors
+---
+```{R}
+master$BA_c = master$BA - mean(master$BA)
+
+fit1<-lm(Income~BA_c*CivilWar, data= master)
+summary(fit1)
+
+ggplot(master, aes(x=BA_c, y=Income,group=CivilWar))+geom_point(aes(color=CivilWar))+
+  geom_smooth(method="lm",se=F,fullrange=T,aes(color=CivilWar))+
+theme(legend.position=c(.9,.19))
+
+resids<-fit1$residuals; fitvals<-fit1$fitted.values
+
+shapiro.test(resids)
+
+ggplot()+geom_point(aes(fitvals,resids))+geom_hline(yintercept=0, color='red')
+
+coeftest(fit1, vcov = vcovHC(fit1))
+
+fit2<-lm(Income~BA_c+CivilWar, data= master)
+summary(fit2)
+```
+*With CivilWar Border states as the reference group, the linear regression predicts per capita income from mean centered BA and CivilWar grouping. With the y intercept set at when BA_c is equal to 0, Border states make $36508.11 income at mean BA. For confederate states, the y intercept drops by $426.70 income. For other states, the y intercept drops by $315.12 income. For Union states, the y intercept increases by $938.97 income. The slope at which Income increases per unit increase in BA_c for Border states, the reference group, is $764.03. For confederate states, this slope decreases by $51.72. For Other states, the slope drops by $343.63. For Union states, the slope increases by $332.86. Using the shapiro-wilk test, the normality assumption was met with a p value of .5675. Plotting out fitted values to the residuals indicated that the model also roughly met the linearity and homoskedsaticity assumptions. Not much changed using robust standard errors, as none of the predictors and interactions had significance prior to and after using the robust standard errors. P values did decrease a little bit across the board however. Overall, the predictors of BA_c and CivilWar status and their interactions were not strong predictors of Income. With an adjusted R-squared value of .5846, 58.46% of the variation in Income was explained by this model. Running another model without interactions yielded a model that had BA_c as a significant predictor of Income.*
+
+Boostrap Method
+---
+```{R}
+#Bootstrapped version
+#SE were less than robust so p value is smaller and thus more significant
+set.seed(123)
+samp_distn=NULL
+samp_distn<-replicate(1000, {
+ boot_dat<-master[sample(nrow(master),replace=TRUE),]
+ fit<-lm(Income~BA_c*CivilWar,data=boot_dat)
+ coef(fit)
+})
+
+samp_distn = do.call(rbind,lapply(samp_distn, unlist))
+samp_distn%>%as.data.frame%>%summarize_all(sd,na.rm=T)
+```
+*The standard errors from the bootstrap method except for BA_c:CivilWarO, were lower than that of the robust standard errors method and significantly lower than those of the original model. This would indicate that the pvalues for the bootstrapped standard errors would be lower than both the robust and original model for all the predictors except for BA_c:CivilWarO.*
+
+Logistic Regression and Cross validation
+---
+```{R}
+class_diag<-function(probs,truth){
+  
+  tab<-table(factor(probs>.5,levels=c("FALSE","TRUE")),truth)
+  acc=sum(diag(tab))/sum(tab)
+  sens=tab[2,2]/colSums(tab)[2]
+  spec=tab[1,1]/colSums(tab)[1]
+  ppv=tab[2,2]/rowSums(tab)[2]
+
+  if(is.numeric(truth)==FALSE & is.logical(truth)==FALSE) truth<-as.numeric(truth)-1
+
+  ord<-order(probs, decreasing=TRUE)
+  probs <- probs[ord]; truth <- truth[ord]
+  
+  TPR=cumsum(truth)/max(1,sum(truth)) 
+  FPR=cumsum(!truth)/max(1,sum(!truth))
+  
+  dup<-c(probs[-1]>=probs[-length(probs)], FALSE)
+  TPR<-c(0,TPR[!dup],1); FPR<-c(0,FPR[!dup],1)
+  
+  n <- length(TPR)
+  auc<- sum( ((TPR[-1]+TPR[-n])/2) * (FPR[-1]-FPR[-n]) )
+
+  data.frame(acc,sens,spec,ppv,auc)
+}
+
+fit3<-glm(ObamaWin~BA+Income+Church+Teen+HS+CivilWar, data=master, family="binomial")
+coeftest(fit3)
+
+prob=predict(fit3,type="response")
+
+table(predict=as.numeric(prob>.5),truth=master$ObamaWin)%>%addmargins
+
+class_diag(prob, master$ObamaWin)
+
+master$ObamaWinf<-as.factor(master$ObamaWin)
+master$logit<-predict(fit3,type="link")
+master%>%ggplot()+geom_density(aes(logit,color=ObamaWinf,fill=ObamaWinf), alpha=.4)+
+  theme(legend.position=c(.85,.85))+geom_vline(xintercept=0)+xlab("predictor (logit)")
+
+ROCplot=ggplot(master)+geom_roc(aes(d=ObamaWin,m=prob), n.cuts=0) 
+ROCplot
+calc_auc(ROCplot)
+
+set.seed(1234)
+k=10
+data1<-master[sample(nrow(master)),] 
+folds<-cut(seq(1:nrow(master)),breaks=k,labels=F)
+
+diags<-NULL
+for(i in 1:k){ 
+  train<-data1[folds!=i,]
+  test<-data1[folds==i,] 
+  truth<-test$ObamaWin
+  
+  fit<- glm(ObamaWin~BA+Income+Church+Teen+HS+CivilWar, data=train, family="binomial")
+  probs<- predict(fit,newdata=test, type="response")
+ 
+  diags<-rbind(diags,class_diag(probs,truth)) 
+}
+apply(diags,2,mean)
+```
+*With Border states as the reference group, higher levels of BA, Income and Teen increases the probability of the state voting for Obama. Having a higher level of Church and HS decreases the probability of the state voting for Obama. Compared to Border states, confederate, Other and Union states all have higher proabilities of voting for Obama. With the cutoff set to .5, the accuracy of the model is .92, the true positive rate is .928, the false positive rate is .909 and the recall is .928. The ROC plot had an AUC of 0.9659 which indicates that the model is very good at predicting whether a state would vote for Obama. However, doing a 10 fold CV with this model, the accuracy dropped to .82, true positive rate dropped to .9, false positive rate dropped to .725, the recall dropped to .818 and the AUC dropped to .85. These results indicate that the model was overfitted with too many predictors.*
+
+Lasso Test
+---
+```{R}
+fit4 <- glm(ObamaWin ~ -1 + BA+Income+Church+Teen+HS+CivilWar, data = master, family = "binomial")
+x<-model.matrix(fit4)
+x<-scale(x)
+y<-as.matrix(master$ObamaWin)
+
+cv<-cv.glmnet(x,y,family="binomial")
+lasso<-glmnet(x,y,family="binomial",lambda=cv$lambda.1se)
+coef(lasso)
+
+masterdum= data.frame(master,
+Union=ifelse(master$CivilWar=="U",1,0))
+
+set.seed(1234)
+k=10
+data1<-masterdum[sample(nrow(masterdum)),] 
+folds<-cut(seq(1:nrow(masterdum)),breaks=k,labels=F) 
+
+diags<-NULL
+for(i in 1:k){ 
+  train<-data1[folds!=i,] 
+  test<-data1[folds==i,]
+  truth<-test$ObamaWin
+  
+  fit<- glm(ObamaWin~BA+Income+Church+Union, data=train, family="binomial")
+  probs<- predict(fit,newdata=test, type="response")
+ 
+  diags<-rbind(diags,class_diag(probs,truth)) 
+}
+apply(diags,2,mean)
+```
+*Running a Lasso regression on the model, only BA, Income, Church, and being a Union state was found to be significant. Running a 10 fold CV on the new model with only the Lasso variables, gave a slightly better accuracy of .84, a slightly worse true positive rate of .866, a better false positive rate of .825, a better recall of .858 and a better AUC of .908. Overall, the lasso model performed better than the original model during 10 fold CV and is less likely to be overfitted.*
+```{R, echo=F}
+## DO NOT DELETE THIS BLOCK!
+sessionInfo()
+Sys.time()
+Sys.info()
+```
