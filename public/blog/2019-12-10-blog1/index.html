@@ -7,7 +7,7 @@
     <meta name="author" content="Joseph Kim" />
     <meta name="description" content="Describe your website">
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
-    <title>Resume</title>
+    <title>Python Basics for Data Analysis</title>
     <meta name="generator" content="Hugo 0.60.1" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="/css/main.css" />
@@ -56,12 +56,12 @@
       <div class="container">
         <div class="blog-post">
           <h3>
-            <strong><a href="/resume-page/">Resume</a></strong>
+            <strong><a href="/blog/2019-12-10-blog1/">Python Basics for Data Analysis</a></strong>
           </h3>
         </div>
         <div class="blog-title">
           <h4>
-          December 11, 2019
+          December 10, 2019
             &nbsp;&nbsp;
             
           </h4>
@@ -72,38 +72,56 @@
               
 
 
-<div id="about-me" class="section level2">
-<h2>About Me</h2>
-<p>I am a senior Biology student at the University of Texas at Austin. I am from Dallas, Texas.
-Tennis and sculpture are some of my favorite passtimes! Contact me at <a href="mailto:Boksunni1@gmail.com" class="email">Boksunni1@gmail.com</a>!
-For a more detailed resume, click on the link on the homepage!</p>
-</div>
-<div id="awards" class="section level2">
-<h2>Awards</h2>
-<ul>
-<li><p>National Merit Finalist: 2016</p></li>
-<li><p>Undergraduate Research Fellowship: 2019</p></li>
-<li><p>Ralph A Steiner MD Scholarship: 2017-2018</p></li>
-<li><p>Jack Roloson Endowed Presidential Scholarship: 2018-2020</p></li>
-</ul>
-</div>
-<div id="work-experience" class="section level2">
-<h2>Work Experience</h2>
-<ul>
-<li>UTSouthwestern Student Intern: Summer of 2015, 2016, 2017<br />
-</li>
-<li>FRI Research Mentor: Jan 2018-Present</li>
-</ul>
-</div>
-<div id="skills" class="section level2">
-<h2>Skills</h2>
-<p>Research competencies in:<br />
-- qPCR<br />
-- RNA extraction<br />
-- Western Blot<br />
-- Lentiviral production<br />
-- Cell culture<br />
-- Dissections</p>
+<div id="using-python-to-examine-datasets-basics" class="section level2">
+<h2>Using Python to examine datasets (Basics)</h2>
+<p><img src="/blog/2019-12-10-Blog1_files/python-logo.png" /></p>
+<pre class="r"><code>library(reticulate)
+library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages ---------------------------- tidyverse 1.2.1 --</code></pre>
+<pre><code>## v ggplot2 3.2.1     v purrr   0.3.2
+## v tibble  2.1.3     v dplyr   0.8.3
+## v tidyr   1.0.0     v stringr 1.4.0
+## v readr   1.3.1     v forcats 0.4.0</code></pre>
+<pre><code>## -- Conflicts ------------------------------- tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>faithful&lt;-faithful
+glimpse(faithful)</code></pre>
+<pre><code>## Observations: 272
+## Variables: 2
+## $ eruptions &lt;dbl&gt; 3.600, 1.800, 3.333, 2.283, 4.533, 2.883, 4.700, 3.6...
+## $ waiting   &lt;dbl&gt; 79, 54, 74, 62, 85, 55, 88, 85, 51, 85, 54, 84, 78, ...</code></pre>
+<p><em>R and python have many similar functions and are compatible with each other through an R markdown file! Here I will be looking into the faithful dataset and see how I can use functions from pandas.</em></p>
+<pre class="python"><code>faithful=r.faithful 
+import py_compile
+import pandas as pd
+min(faithful[&quot;eruptions&quot;])</code></pre>
+<pre><code>## 1.6</code></pre>
+<pre class="python"><code>max(faithful[&quot;eruptions&quot;])</code></pre>
+<pre><code>## 5.1</code></pre>
+<pre class="python"><code>min(faithful[&quot;waiting&quot;])</code></pre>
+<pre><code>## 43.0</code></pre>
+<pre class="python"><code>max(faithful[&quot;waiting&quot;])</code></pre>
+<pre><code>## 96.0</code></pre>
+<p><em>Using the min and max functions, I can examine the lowest and highest values of the various variables within the faithful dataset! This is identical to the min and max functions of R!</em></p>
+<pre class="python"><code>import numpy as np
+
+np.mean(faithful[&quot;eruptions&quot;])</code></pre>
+<pre><code>## 3.4877830882352936</code></pre>
+<pre class="python"><code>np.mean(faithful[&quot;waiting&quot;])</code></pre>
+<pre><code>## 70.8970588235294</code></pre>
+<pre class="python"><code>np.median(faithful[&quot;eruptions&quot;])</code></pre>
+<pre><code>## 4.0</code></pre>
+<pre class="python"><code>np.median(faithful[&quot;waiting&quot;])</code></pre>
+<pre><code>## 76.0</code></pre>
+<pre class="python"><code>np.var(faithful[&quot;eruptions&quot;])</code></pre>
+<pre><code>## 1.2979388904492855</code></pre>
+<pre class="python"><code>np.var(faithful[&quot;waiting&quot;])</code></pre>
+<pre><code>## 184.14381487889264</code></pre>
+<pre class="python"><code>np.corrcoef(faithful[&quot;eruptions&quot;],faithful[&quot;waiting&quot;])</code></pre>
+<pre><code>## array([[1.        , 0.90081117],
+##        [0.90081117, 1.        ]])</code></pre>
+<p><em>Through numpy, I can look at the mean, median, variance, and correllation coefficients of the variables of the faithful dataset. While you would use tidyverse and the summarize function to get these values, python has standalone functions through numpy! Python is very flexible for analyzing data!</em></p>
 </div>
 
               <hr>
