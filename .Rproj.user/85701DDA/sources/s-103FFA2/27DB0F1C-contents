@@ -20,6 +20,6 @@ blogdown::serve_site()
 blogdown::build_site()
 
 #??????????
-git add.
+git add .
 git commit -m "another commit"
 git push origin master
